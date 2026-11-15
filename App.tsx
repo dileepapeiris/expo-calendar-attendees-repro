@@ -15,3 +15,10 @@ function describe(a: any) {
   const fields = FIELDS.map((f) => `${f}=${JSON.stringify(a?.[f])}`).join('  ');
   return `${fields}\n   own keys: [${own.join(', ')}]  proto keys: [${proto.join(', ')}]`;
 }
+
+async function runCheck(): Promise<string[]> {
+  const out: string[] = [];
+  const { status } = await Calendar.requestCalendarPermissions();
+  if (status !== 'granted') throw new Error('calendar permission not granted');
+  return out;
+}
