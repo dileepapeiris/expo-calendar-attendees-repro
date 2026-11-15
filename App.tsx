@@ -20,5 +20,11 @@ async function runCheck(): Promise<string[]> {
   const out: string[] = [];
   const { status } = await Calendar.requestCalendarPermissions();
   if (status !== 'granted') throw new Error('calendar permission not granted');
+  const calendars = await Calendar.getCalendars(Calendar.EntityTypes.EVENT);
+  const start = new Date();
+  const end = new Date(start.getTime() + 14 * 24 * 60 * 60 * 1000);
+  const events = await Calendar.listEvents(calendars, start, end);
+  out.push(`${events.length} event(s) in the next 14 days, ${calendars.length} calendar(s)`);
+  for (const event of events) {
   return out;
 }
