@@ -26,5 +26,11 @@ async function runCheck(): Promise<string[]> {
   const events = await Calendar.listEvents(calendars, start, end);
   out.push(`${events.length} event(s) in the next 14 days, ${calendars.length} calendar(s)`);
   for (const event of events) {
+    const attendees = await event.getAttendees();
+    const legacy = await getAttendeesForEventAsync(event.id);
+    out.push(`\n"${event.title}" (${event.id})`);
+    out.push(`class API getAttendees(): ${attendees.length} object(s)`);
+    attendees.forEach((a, i) => out.push(` [${i}] ${describe(a)}`));
+  }
   return out;
 }
