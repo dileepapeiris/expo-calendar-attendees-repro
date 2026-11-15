@@ -59,3 +59,27 @@ Xcode 27 shows simulators in DeviceHub, which ignores AppleScript clicks. `scrip
 posts real mouse events at screenshot coordinates so the taps above can be scripted; it needs
 `pip install pyobjc-framework-Quartz` and Accessibility access for the terminal.
 
+## Cause
+
+`packages/expo-calendar/ios/Next/CalendarNextModule.swift` registers the attendee class with an
+empty definition:
+
+```swift
+// Available only on Android
+Class(ExpoCalendarAttendee.self) {}
+```
+
+while the same file keeps `AsyncFunction("getAttendees")` on iOS and
+`ios/Next/ExpoCalendarEvent.swift` wraps each `EKParticipant` in an `ExpoCalendarAttendee`. With
+no `Property` definitions the shared object reaches JavaScript with nothing on it. Android's
+`CalendarNextModule.kt` defines `id`, `name`, `role`, `status`, `type` and the rest. The legacy
+iOS path serializes the same `EKParticipant` in `ios/Conversions/Conversions.swift` with
+`isCurrentUser`, `name`, `role`, `status`, `type` and `url`, which is what the right column above
+shows.
+
+The TypeScript docs disagree with each other: in `src/ExpoCalendar.types.ts` the
+`ExpoCalendarAttendee` class is marked `@platform android`, its `isCurrentUser` and `url` fields are
+marked `@platform ios`, and `getAttendees()` carries no platform note.
+
+Checked against `expo/expo` main on 11/15/26: the attendee class registration is unchanged.
+
