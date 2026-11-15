@@ -31,6 +31,9 @@ async function runCheck(): Promise<string[]> {
     out.push(`\n"${event.title}" (${event.id})`);
     out.push(`class API getAttendees(): ${attendees.length} object(s)`);
     attendees.forEach((a, i) => out.push(` [${i}] ${describe(a)}`));
+    out.push(`legacy getAttendeesForEventAsync(): ${legacy.length} object(s)`);
+    legacy.forEach((a, i) => out.push(` [${i}] ${describe(a)}`));
   }
   return out;
 }
+
