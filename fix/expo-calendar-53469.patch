@@ -1,0 +1,105 @@
+From 95361471a2d84b06f0a86d325c0b80fd72be5009 Mon Sep 17 00:00:00 2001
+From: "K.Dileepa Thushan Peiris" <dileepapeiris5@gmail.com>
+Date: Sun, 15 Nov 2026 09:56:11 +0530
+Subject: [PATCH 1/3] [calendar][ios] Expose the EKParticipant fields on the
+ class-based attendee
+
+---
+ .../ios/Next/CalendarNextModule.swift         | 27 +++++++++++++++++--
+ 1 file changed, 25 insertions(+), 2 deletions(-)
+
+diff --git a/packages/expo-calendar/ios/Next/CalendarNextModule.swift b/packages/expo-calendar/ios/Next/CalendarNextModule.swift
+index 656705d1321..256035a0b58 100644
+--- a/packages/expo-calendar/ios/Next/CalendarNextModule.swift
++++ b/packages/expo-calendar/ios/Next/CalendarNextModule.swift
+@@ -653,8 +653,31 @@ public final class CalendarNextModule: Module {
+       }
+     }
+ 
+-    // Available only on Android
+-    Class(ExpoCalendarAttendee.self) {}
++    Class(ExpoCalendarAttendee.self) {
++      Property("isCurrentUser") { (expoAttendee: ExpoCalendarAttendee) in
++        expoAttendee.attendee.isCurrentUser
++      }
++
++      Property("name") { (expoAttendee: ExpoCalendarAttendee) in
++        expoAttendee.attendee.name
++      }
++
++      Property("role") { (expoAttendee: ExpoCalendarAttendee) in
++        participantToString(role: expoAttendee.attendee.participantRole)
++      }
++
++      Property("status") { (expoAttendee: ExpoCalendarAttendee) in
++        participantStatusToString(status: expoAttendee.attendee.participantStatus)
++      }
++
++      Property("type") { (expoAttendee: ExpoCalendarAttendee) in
++        participantTypeToString(type: expoAttendee.attendee.participantType)
++      }
++
++      Property("url") { (expoAttendee: ExpoCalendarAttendee) in
++        expoAttendee.attendee.url.absoluteString.removingPercentEncoding
++      }
++    }
+   }
+ 
+   private func presentEventEditViewController(event: EKEvent, promise: Promise) throws {
+-- 
+2.54.0 (Apple Git-157)
+
+
+From a793272e071e02aa485e024d2292623647504746 Mon Sep 17 00:00:00 2001
+From: "K.Dileepa Thushan Peiris" <dileepapeiris5@gmail.com>
+Date: Sun, 15 Nov 2026 09:56:11 +0530
+Subject: [PATCH 2/3] [calendar] Drop the Android-only note from
+ ExpoCalendarAttendee and say iOS attendees are read-only
+
+---
+ packages/expo-calendar/src/ExpoCalendar.types.ts | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/packages/expo-calendar/src/ExpoCalendar.types.ts b/packages/expo-calendar/src/ExpoCalendar.types.ts
+index 9dfd61447f8..1ec2452943c 100644
+--- a/packages/expo-calendar/src/ExpoCalendar.types.ts
++++ b/packages/expo-calendar/src/ExpoCalendar.types.ts
+@@ -586,8 +586,8 @@ export declare class ExpoCalendarReminder {
+ }
+ 
+ /**
+- * Represents a calendar attendee object.
+- * @platform android
++ * Represents a calendar attendee object. On iOS, attendees are read-only: EventKit has no API to
++ * add, update or delete them.
+  */
+ export declare class ExpoCalendarAttendee {
+   /**
+-- 
+2.54.0 (Apple Git-157)
+
+
+From 162126892e7911345b0e75156cccd512baa84a83 Mon Sep 17 00:00:00 2001
+From: "K.Dileepa Thushan Peiris" <dileepapeiris5@gmail.com>
+Date: Sun, 15 Nov 2026 09:56:11 +0530
+Subject: [PATCH 3/3] Changeset for the iOS attendee properties
+
+---
+ .changeset/expo-calendar-ios-attendee-properties.md | 5 +++++
+ 1 file changed, 5 insertions(+)
+ create mode 100644 .changeset/expo-calendar-ios-attendee-properties.md
+
+diff --git a/.changeset/expo-calendar-ios-attendee-properties.md b/.changeset/expo-calendar-ios-attendee-properties.md
+new file mode 100644
+index 00000000000..52ed930079b
+--- /dev/null
++++ b/.changeset/expo-calendar-ios-attendee-properties.md
+@@ -0,0 +1,5 @@
++---
++'expo-calendar': patch
++---
++
++[iOS] Expose `name`, `role`, `status`, `type`, `url` and `isCurrentUser` on the attendee objects that `ExpoCalendarEvent.getAttendees()` returns. The class was registered without properties, so every field read as `undefined`.
+-- 
+2.54.0 (Apple Git-157)
+
