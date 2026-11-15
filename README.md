@@ -88,3 +88,19 @@ Checked against `expo/expo` main on 11/15/26: the attendee class registration is
 On iOS the class-based attendee objects expose the fields the legacy serializer returns (`name`,
 `role`, `status`, `type`, `url`, `isCurrentUser`), or `getAttendees()` is documented as
 Android-only. Creating attendees stays Android-only either way, since EventKit has no API for it.
+
+## Fix
+
+https://github.com/expo/expo/pull/53535 (`fix/expo-calendar-53469.patch` here) gives the iOS
+`ExpoCalendarAttendee` class `Property` definitions for `isCurrentUser`, `name`, `role`,
+`status`, `type` and `url`, read from the wrapped `EKParticipant` through the same helpers the
+legacy serializer uses, and drops the `@platform android` note from the class docs.
+
+| `event.getAttendees()` before | `event.getAttendees()` after the fix |
+| --- | --- |
+| ![every field undefined](media/ios-result-class-api.png) | ![name, role, status, type, url and isCurrentUser filled](media/ios-result-class-api-after-fix.png) |
+
+Full screen after the fix, class API above, legacy below, same values:
+[media/ios-result-after-fix.png](media/ios-result-after-fix.png). Measured on the same simulator
+with the patch applied to the installed `expo-calendar` 58.0.6 (`node_modules/expo-calendar/ios/Next/CalendarNextModule.swift`)
+and the app rebuilt with `npx expo run:ios`.
