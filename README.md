@@ -83,3 +83,8 @@ marked `@platform ios`, and `getAttendees()` carries no platform note.
 
 Checked against `expo/expo` main on 11/15/26: the attendee class registration is unchanged.
 
+## Expected
+
+On iOS the class-based attendee objects expose the fields the legacy serializer returns (`name`,
+`role`, `status`, `type`, `url`, `isCurrentUser`), or `getAttendees()` is documented as
+Android-only. Creating attendees stays Android-only either way, since EventKit has no API for it.
