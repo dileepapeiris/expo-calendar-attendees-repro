@@ -37,3 +37,24 @@ async function runCheck(): Promise<string[]> {
   return out;
 }
 
+export default function App() {
+  const [lines, setLines] = useState<string[]>(['running…']);
+  const run = () => runCheck().then(setLines).catch((e) => setLines([`error: ${e}`]));
+  useEffect(() => { run(); }, []);
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>expo-calendar getAttendees() on iOS (#53469)</Text>
+      <Button title="run again" onPress={run} />
+      <ScrollView style={styles.scroll}>
+        {lines.map((l, i) => <Text key={i} style={styles.line} testID={`line-${i}`}>{l}</Text>)}
+      </ScrollView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, paddingTop: 64, paddingHorizontal: 12, backgroundColor: '#fff' },
+  title: { fontSize: 16, fontWeight: '700', marginBottom: 8 },
+  scroll: { flex: 1, marginTop: 8 },
+  line: { fontFamily: 'Menlo', fontSize: 11, marginBottom: 2 },
+});
